@@ -142,6 +142,50 @@ else:
 
 然后运行一下，这样就不会抛出 `RuntimeError` 了。
 
+## Windows CMD 中运行 Python 解释器出现 `LookupError: unknown encoding:` 问题
+
+CMD 中，cp65001 对应 UTF-8 编码，而 cp936 对应 GBK (gbk2312) 编码。
+
+### 现象
+```shell
+Microsoft Windows [Version 10.0.17134.472]
+(c) 2018 Microsoft Corporation。保留所有权利。
+
+C:\Users\joseph>python2
+Python 2.7.12 (v2.7.12:d3...) [MSC v.1500 32 bit (Intel)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+
+LookupError: unknown encoding: cp65001
+>>> import sys
+
+LookupError: unknown encoding: cp65001
+>>>
+```
+
+### Solution
+
+```shell
+Microsoft Windows [Version 10.0.17134.472]
+(c) 2018 Microsoft Corporation。保留所有权利。
+
+C:\Users\joseph>chcp 936
+
+活动代码页: 936
+
+C:\Users\joseph>
+C:\Users\joseph>
+C:\Users\joseph>python2
+Python 2.7.12 (v2.7.12:d33...) [MSC v.1500 32 bit (Intel)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+>>> # -*- coding: utf-8 -*-
+...
+>>> import sys
+>>>
+```
+
+**Reference:** [[python] 命令行模式下出现cp65001异常](https://blog.csdn.net/bobodem/article/details/79508787)
 
 ## Note: 更多 Python 程序上的基础问题（非代码本身bug）收集补充中...
 
