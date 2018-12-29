@@ -187,6 +187,64 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 **Reference:** [[python] 命令行模式下出现cp65001异常](https://blog.csdn.net/bobodem/article/details/79508787)
 
+## “奇异”现象（和预期不符的现象）
+
+### print() 不输出，在程序结束（Ctrl+C）时大块输出
+
+你可能使用了 `end=""`; 同时程序中没有其它地方使用 `print()` 并且**没有**`end=''`;
+这是因为解释器会默认会等待有“一行”的时候再输出。
+
+产生该现象的代码可能像这样：
+
+```python
+def main():
+    i = 0
+    from time import sleep
+    while True:
+        print(i, "; ", end="", )
+        i += 1
+
+        sleep(1)  # 这里使用 sleep 表示其它耗时的运算（即其它耗时代码在运行）
+
+if __name__ == "__main__":
+    main()
+```
+
+你可能预期它的输出像这样：
+
+![print_with_end=_and_with_flush](https://img-blog.csdnimg.cn/20181229192330958.gif)
+
+但是它却像这样：
+
+#### 运行时不输出，结束程序时大块输出的现象
+
+![print_with_end=_but_no_flush](https://img-blog.csdnimg.cn/20181229193010429.gif)
+
+#### solution
+
+问题的关键在与 python 解释器的行为，在输出的时候，它会等待出现 "\n" 换行符之后输出；
+即，如果将上面代码换成 `print(i, "; \n", end="")` 就会马上输出。
+
+当然，这应该不是你想要的，因为你就是希望不要换行，才使用了 `end=""`。
+所以，既然知道了原因，那么就要了解一下 `print` 函数的另外一个可选参数 `flush` 了。
+它表示清空“输出缓存”（它用在 print 里面，当然既是“输出”的缓存）。默认情况下，它是 `flush=False`，
+
+所以这种情况下，只要将
+
+```python
+print(i, "; ", end="")
+```
+
+换成 
+
+```python
+print(i, "; ", end="", flush=True)
+```
+
+这样即可！
+
+
+
 ## Note: 更多 Python 程序上的基础问题（非代码本身bug）收集补充中...
 
 #### 加入本文的编辑？
